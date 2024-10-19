@@ -20,11 +20,11 @@ class ZabbixSender {
 
         options = (typeof options !== 'undefined') ? options : {};
 
-        this.serverHost     = options.serverHost || 'localhost';
-        this.serverPort     = parseInt(options.serverPort) || 10051;
-        this.timeout        = parseInt(options.timeout) || 5000;
+        this.serverHost = options.serverHost || 'localhost';
+        this.serverPort = parseInt(options.serverPort) || 10051;
+        this.timeout = parseInt(options.timeout) || 5000;
         this.withTimestamps = options.withTimestamps || false;
-        this.agentHost      = options.agentHost;
+        this.agentHost = options.agentHost;
 
         // prepare items array
         this.clearItems();
@@ -39,8 +39,8 @@ class ZabbixSender {
 
             // if just 2 args provided
             value = key;
-            key   = host;
-            host  = this.agentHost;
+            key = host;
+            host = this.agentHost;
         }
 
         const length = this.items.push({
@@ -77,12 +77,12 @@ class ZabbixSender {
 
         // console.log(data); // DEBUG
 
-        const payload = new Buffer(JSON.stringify(data), 'utf8');
-        const header  = new Buffer(5 + 4); // ZBXD\1 + packed payload.length
+        const payload = Buffer.from(JSON.stringify(data), 'utf8');
+        const header = Buffer.alloc(5 + 4); // ZBXD\1 + packed payload.length
 
         header.write('ZBXD\x01');
         header.writeInt32LE(payload.length, 5);
-        return Buffer.concat([header, new Buffer('\x00\x00\x00\x00'), payload]);
+        return Buffer.concat([header, Buffer.from('\x00\x00\x00\x00'), payload]);
     }
 
     send(callback) {
@@ -90,12 +90,12 @@ class ZabbixSender {
         callback = (typeof callback === 'function') ? callback : () => {
         };
 
-        let self     = this,
-            error    = false,
-            items    = this.items,
-            data     = this.prepareData(items, this.withTimestamps),
-            client   = new net.Socket(),
-            response = new Buffer(0);
+        let self = this,
+            error = false,
+            items = this.items,
+            data = this.prepareData(items, this.withTimestamps),
+            client = new net.Socket(),
+            response = Buffer.alloc(0);
 
         // uncoment when debugging
         // console.log(data.slice(13).toString());
